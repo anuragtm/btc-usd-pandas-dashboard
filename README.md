@@ -13,3 +13,14 @@ A small pandas project that downloads BTC-USD pair daily price data and generate
 ## Setup
 ```bash
 pip3 install -r requirements.txt
+
+## Charts(examples)
+
+### Price with SMA20/SMA50
+![Price SMA](outputs/price_sma.png)
+
+### Drawdown
+![Drawdown](outputs/drawdown.png)
+
+### Rolling 20-day Volatility
+![Volatility](outputs/Volatility_20d.png)
