@@ -13,7 +13,7 @@ A small pandas project that downloads BTC-USD pair daily price data and generate
 ## Setup
 ```bash
 pip3 install -r requirements.txt
-```text
+```
 
 ## Charts (examples)
 ### Price with SMA20/SMA50
