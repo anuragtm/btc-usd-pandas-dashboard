@@ -1,0 +1,12 @@
+__pycachce__/
+*.__pyc 
+
+#for mac
+.DS_Store
+
+# Virtual environments
+.venv/
+venv/
+
+#Jupyter (if ever use)
+.ipynb_checkpoints/
