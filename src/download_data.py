@@ -16,7 +16,7 @@ def main():
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
 
-    df = df.reset_index() #make date a normal column(not index); means turns date index into noraml date column
+    df = df.reset_index() #trynna make datea normal coulumn(Not index)
 
     df["Ticker"] = ticker
 
