@@ -1,8 +1,10 @@
 from pathlib import Path
 import pandas as pd
-import sklearn
+
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1] #resolve gives full absolute path
 DATA_PATH = PROJECT_ROOT / "data" / "btcusd.csv"
@@ -22,19 +24,32 @@ print(df.columns.tolist())
 df["daily_return"] = df["Adj Close"].pct_change()
 df["return_lag1"] = df["daily_return"].shift(1)
 df["return_lag2"] = df["daily_return"].shift(2)
+#trendFeatures
+df["sma20"] = df["Close"].rolling(20).mean()    #short-term
+df["sma50"] = df["Close"].rolling(50).mean()  #lt
+df["sma_gap_pct"] = ((df["sma20"] / df["sma50"]) - 1) * 100 
+#Volatility
+df["vol20"] = df["daily_return"].rolling(20).std()
+df["vol20_pct"] = df["vol20"] * 100
+#drawdownFeat
+df["peak"] = df["Adj Close"].cummax()
+df["drawdown"] = (df["Adj Close"] / df["peak"]) - 1
+df["drawdown_pct"] = df["drawdown"] * 100
 
 #target
 df["next_day_up"] = (df["Adj Close"].shift(-1) > df["Adj Close"]).astype(int) #shift(-1) pulls tomorrow price upward into todays row, astype(T to 1, F to 0)
 
+feature_cols = ["daily_return", "return_lag1", "return_lag2", "sma20", "sma50", "sma_gap_pct", "vol20_pct", "drawdown_pct",]
+
 #build clean modeling dataset
-model_df = df[["Date", "daily_return", "return_lag1", "return_lag2", "next_day_up"]].copy()
+model_df = df[["Date"] + feature_cols + ["next_day_up"]].copy()
 model_df = model_df.dropna().reset_index(drop=True)
 model_df = model_df.iloc[:-1].reset_index(drop=True)
 
 print("\n Clean modeling dataset shape:", model_df.shape)
 
-#inputFeatues
-x = model_df[["daily_return", "return_lag1", "return_lag2"]]
+#inputFeatues x =inputFeat, y=target
+x = model_df[feature_cols]
 y = model_df["next_day_up"]
 
 #train&test split
@@ -54,8 +69,11 @@ print(train_dates.iloc[0], "to", train_dates.iloc[-1])
 print("\nTest data range:")
 print(test_dates.iloc[0], "to", test_dates.iloc[-1])
 
-model = LogisticRegression(max_iter=1000) #Build model
-model.fit(X_train,y_train) #train 
+#buildin&train modelPipeline
+model = Pipeline([("scaler", StandardScaler()),
+("logistic_regression", LogisticRegression(max_iter=1000))])
+
+model.fit(X_train, y_train)#modelTrain
 y_pred = model.predict(X_test) #predict on test set
 accuracy = accuracy_score(y_test, y_pred) #actual answers vs predicted ans
 print(f"\n Logistic Regression Accuracy: {accuracy:.4f}")
@@ -74,7 +92,7 @@ print(pd.Series(y_pred).value_counts())
 
 baseline_up_accuracy =  (y_test == 1).mean()
 baseline_down_accuracy = (y_test == 0).mean()
-print("\n Basline accuracy if always predicting 1/up:")
+print("\n Baseline accuracy if always predicting 1/up:")
 print(f"{baseline_up_accuracy:.4f}")
 print("\nBaseline accuracy of always predicting 0/down:")
 print(f"{baseline_down_accuracy:.4f}")
@@ -84,3 +102,6 @@ print("\nConfusion Matrix:")
 print("[[TN, FP],") # 0(down)0,1
 print(" [FN, TP]]") #1(up)0,1
 print(cm)
+
+print("\n Classification Report:")
+print(classification_report(y_test, y_pred, target_names=["Not Up / DowN", "Up"]))
