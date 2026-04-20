@@ -5,6 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.ensemble import RandomForestClassifier
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1] #resolve gives full absolute path
 DATA_PATH = PROJECT_ROOT / "data" / "btcusd.csv"
@@ -70,24 +71,24 @@ print("\nTest data range:")
 print(test_dates.iloc[0], "to", test_dates.iloc[-1])
 
 #buildin&train modelPipeline
-model = Pipeline([("scaler", StandardScaler()),
+log_model = Pipeline([("scaler", StandardScaler()),
 ("logistic_regression", LogisticRegression(max_iter=1000))])
 
-model.fit(X_train, y_train)#modelTrain
-y_pred = model.predict(X_test) #predict on test set
-accuracy = accuracy_score(y_test, y_pred) #actual answers vs predicted ans
-print(f"\n Logistic Regression Accuracy: {accuracy:.4f}")
+log_model.fit(X_train, y_train)#modelTrain
+log_pred = log_model.predict(X_test) #predict on test set
+log_accuracy = accuracy_score(y_test, log_pred) #actual answers vs predicted ans
+print(f"\n Logistic Regression Accuracy: {log_accuracy:.4f}")
 
 results_df = pd.DataFrame({
     "Date": test_dates.values,
     "Actual": y_test.values,
-    "Predicted": y_pred})
+    "Predicted": log_pred})
 print("\n First 10 predictions vs actual:")
 print(results_df.head(10))
 print("\n Actual value counts in test set:")
 print(y_test.value_counts())
 print("\n Predicted value countds:")
-print(pd.Series(y_pred).value_counts())
+print(pd.Series(log_pred).value_counts())
 #above for what real test set distribution VS what the model predicted
 
 baseline_up_accuracy =  (y_test == 1).mean()
@@ -97,11 +98,32 @@ print(f"{baseline_up_accuracy:.4f}")
 print("\nBaseline accuracy of always predicting 0/down:")
 print(f"{baseline_down_accuracy:.4f}")
 
-cm = confusion_matrix(y_test, y_pred)
+cm = confusion_matrix(y_test, log_pred)
 print("\nConfusion Matrix:")
 print("[[TN, FP],") # 0(down)0,1
 print(" [FN, TP]]") #1(up)0,1
 print(cm)
 
 print("\n Classification Report:")
-print(classification_report(y_test, y_pred, target_names=["Not Up / DowN", "Up"]))
+print(classification_report(y_test, log_pred, target_names=["Not Up / DowN", "Up"]))
+
+#random forest model
+
+rf_model = RandomForestClassifier(n_estimators = 200, max_depth=200,random_state=42)
+rf_model.fit(X_train, y_train)
+
+rf_pred = rf_model.predict(X_test)#predict on test set
+rf_accuracy = accuracy_score(y_test, rf_pred)
+print(f"\nRandom Forest Accuracy: {rf_accuracy:.4f}")
+print("\nRandom Forest predicted value counts:")
+print(pd.Series(rf_pred).value_counts())
+
+rf_cm = confusion_matrix(y_test, rf_pred)
+
+print("\nRandom Forest Confusion Matrix:")
+print("[TN, FP],")
+print(" [FN, TP]]")
+print(rf_cm)
+
+print("\nRandom Forest Classification Report:")
+print(classification_report(y_test, rf_pred, target_names=["Not Up / Down", "Up"]))
