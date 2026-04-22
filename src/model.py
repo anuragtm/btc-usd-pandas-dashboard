@@ -115,7 +115,6 @@ print(log_report)
 
 rf_model = RandomForestClassifier(n_estimators = 200, max_depth=5, random_state=42)
 rf_model.fit(X_train, y_train)
-
 rf_pred = rf_model.predict(X_test)#predict on test set
 rf_accuracy = accuracy_score(y_test, rf_pred)
 print(f"\nRandom Forest Accuracy: {rf_accuracy:.4f}")
