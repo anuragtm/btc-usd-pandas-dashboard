@@ -1,0 +1,83 @@
+BTC-USD Next-Day Direction ML Report
+==================================================
+
+Target:
+next_day_up = 1 if tomorrow's Adj Close is higher than today's Adj Close, else 0
+
+Features used:
+- daily_return
+- return_lag1
+- return_lag2
+- sma20
+- sma50
+- sma_gap_pct
+- vol20_pct
+- drawdown_pct
+
+Clean modeling dataset shape: (4162, 10)
+Train shape: (3329, 8)
+Test shape: (833, 8)
+
+Train date range: 2014-11-05 00:00:00 to 2023-12-16 00:00:00
+Test date range: 2023-12-17 00:00:00 to 2026-03-28 00:00:00
+
+Baseline Results
+--------------------------------------------------
+Baseline accuracy if always predicting 1/up: 0.5042
+Baseline accuracy if always predicting 0/down: 0.4958
+
+Logistic Regression Results
+--------------------------------------------------
+Accuracy: 0.5054
+
+Predicted value counts:
+0    749
+1     84
+Name: count, dtype: int64
+
+Confusion Matrix:
+[[TN, FP],
+ [FN, TP]]
+[[375  38]
+ [374  46]]
+
+Classification Report:
+               precision    recall  f1-score   support
+
+Not Up / Down       0.50      0.91      0.65       413
+           Up       0.55      0.11      0.18       420
+
+     accuracy                           0.51       833
+    macro avg       0.52      0.51      0.41       833
+ weighted avg       0.52      0.51      0.41       833
+
+
+Random Forest Results
+--------------------------------------------------
+Accuracy: 0.5006
+
+Predicted value counts:
+0    687
+1    146
+Name: count, dtype: int64
+
+Confusion Matrix:
+[[TN, FP],
+ [FN, TP]]
+[[342  71]
+ [345  75]]
+
+Classification Report:
+               precision    recall  f1-score   support
+
+Not Up / Down       0.50      0.83      0.62       413
+           Up       0.51      0.18      0.27       420
+
+     accuracy                           0.50       833
+    macro avg       0.51      0.50      0.44       833
+ weighted avg       0.51      0.50      0.44       833
+
+
+Short Conclusion
+--------------------------------------------------
+Both models showed weak predictive performance for BTC next-day direction. Logistic Regression and Random Forest were close to the simple baseline, which suggests that the current return, trend, volatility, and drawdown features do not provide a strong signal for reliable next-day direction prediction.
