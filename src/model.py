@@ -206,3 +206,9 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH.write_text("\n".join(report_lines), encoding="utf-8")
 
 print(f"\nSaved ML report to: {REPORT_PATH}")
+
+predictions_df = pd.DataFrame({"Date": test_dates.values, "Actual": y_test.values, "Logistic_Predicted": log_pred,
+                               "RandomForest_Predicted": rf_pred})
+PREDICTIONS_PATH = OUT_DIR / "ml_predictions.csv"
+predictions_df.to_csv(PREDICTIONS_PATH, index=False)
+print(f"Saved ML predictions to: {PREDICTIONS_PATH}")
