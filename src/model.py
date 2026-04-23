@@ -199,8 +199,7 @@ report_lines.append(
     "Both models showed weak predictive performance for BTC next-day direction. "
     "Logistic Regression and Random Forest were close to the simple baseline, "
     "which suggests that the current return, trend, volatility, and drawdown features "
-    "do not provide a strong signal for reliable next-day direction prediction."
-)
+    "do not provide a strong signal for reliable next-day direction prediction.")
 
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH.write_text("\n".join(report_lines), encoding="utf-8")
