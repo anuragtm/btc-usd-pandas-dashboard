@@ -30,7 +30,7 @@ This project also includes a beginner friendly learning extension that predicts 
 
 ##Target
 - `next_day_up = 1` if tomorrow's adjusted close is higher than todays adj. close
-- `next_day_up =0/` otherwise
+- `next_day_up =0` otherwise
 
 ### Features Used
 - `daily_return`
